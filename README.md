@@ -5,12 +5,12 @@
 
 ---
 
-## 🌐 Live Cloud Deployment
+## 🌐 Live AWS Cloud Deployment
 
-- 🏠 **Website Portal**: [https://aivaragentcompliancecardgenerator-22pd10.onrender.com/](https://aivaragentcompliancecardgenerator-22pd10.onrender.com/)
-- 📚 **Interactive Swagger API Docs**: [https://aivaragentcompliancecardgenerator-22pd10.onrender.com/docs](https://aivaragentcompliancecardgenerator-22pd10.onrender.com/docs)
-- 📄 **Live HTML Compliance Card Document**: [https://aivaragentcompliancecardgenerator-22pd10.onrender.com/agents/cards/agent-cs-001/document](https://aivaragentcompliancecardgenerator-22pd10.onrender.com/agents/cards/agent-cs-001/document)
-- 💚 **Cloud Health Check**: [https://aivaragentcompliancecardgenerator-22pd10.onrender.com/health](https://aivaragentcompliancecardgenerator-22pd10.onrender.com/health)
+- 🏠 **Website Portal**: [http://agent-compliance-card-generator--env.eba-ppijekau.ap-south-1.elasticbeanstalk.com/](http://agent-compliance-card-generator--env.eba-ppijekau.ap-south-1.elasticbeanstalk.com/)
+- 📚 **Interactive Swagger API Docs**: [http://agent-compliance-card-generator--env.eba-ppijekau.ap-south-1.elasticbeanstalk.com/docs](http://agent-compliance-card-generator--env.eba-ppijekau.ap-south-1.elasticbeanstalk.com/docs)
+- 📄 **Live HTML Compliance Card Document**: [http://agent-compliance-card-generator--env.eba-ppijekau.ap-south-1.elasticbeanstalk.com/agents/cards/agent-cs-001/document](http://agent-compliance-card-generator--env.eba-ppijekau.ap-south-1.elasticbeanstalk.com/agents/cards/agent-cs-001/document)
+- 💚 **AWS Deep Health Check**: [http://agent-compliance-card-generator--env.eba-ppijekau.ap-south-1.elasticbeanstalk.com/health?full=true](http://agent-compliance-card-generator--env.eba-ppijekau.ap-south-1.elasticbeanstalk.com/health?full=true)
 
 ---
 
@@ -79,7 +79,7 @@ flowchart TD
 - **LLM Engine**: Groq API (LLaMA 3.3 70B Versatile)
 - **Templating**: Jinja2 & Vanilla HTML5/CSS3/JS (Glassmorphism design system)
 - **Testing**: Pytest & HTTPX 
-- **Cloud Deployment**: AWS App Runner (Native Python Source Code Deployment via GitHub Integration)
+- **Cloud Deployment**: AWS Elastic Beanstalk (Python 3.11 Platform with AWS CodePipeline Automated CI/CD)
 
 ---
 
@@ -87,8 +87,8 @@ flowchart TD
 
 ### 1. Clone Repository & Setup Virtual Environment
 ```bash
-git clone https://github.com/PoorvikaGowda23/Aivar_Hackathon_22PD10.git
-cd Aivar_Hackathon_22PD10
+git clone https://github.com/PoorvikaGowda23/Aivar_Hackathon_AWS_22PD10.git
+cd Aivar_Hackathon_AWS_22PD10
 
 # Create virtual environment
 python -m venv myenv
@@ -107,7 +107,7 @@ pip install -r requirements.txt
 Create a `.env` file in the root directory:
 ```env
 GROQ_API_KEY=gsk_your_groq_api_key_here
-DATABASE_URL=database:///./compliance_cards.db
+DATABASE_URL=sqlite:///./compliance_cards.db
 ```
 
 ### 4. Run Application Server
@@ -123,47 +123,29 @@ pytest tests/ -v
 
 ---
 
-## ☁️ AWS App Runner Deployment Guide (GitHub Source Code — No Docker)
+## ☁️ AWS Elastic Beanstalk + CodePipeline Deployment Guide
 
-Follow these steps to deploy the application directly to **AWS App Runner** from your GitHub repository:
+Follow these steps to deploy the application directly to **AWS Elastic Beanstalk** using an automated **AWS CodePipeline** CI/CD integration:
 
-### Step 1: Push Repository to GitHub
-Ensure your repository contains the [`apprunner.yaml`](file:///c:/Users/user/Desktop/VSC%20Folder/Aivar_Hackathon_AWS_22PD10/apprunner.yaml) file:
-```bash
-git add apprunner.yaml
-git commit -m "Add AWS App Runner configuration"
-git push origin main
-```
+### Step 1: Push Repository Configurations
+Ensure your repository contains the [`Procfile`](file:///c:/Users/user/Desktop/VSC%20Folder/Aivar_Hackathon_AWS_22PD10/Procfile) and [`.ebextensions/01_fastapi.config`](file:///c:/Users/user/Desktop/VSC%20Folder/Aivar_Hackathon_AWS_22PD10/.ebextensions/01_fastapi.config) files.
 
-### Step 2: Create AWS App Runner Service
-1. Log into the **AWS Management Console** and navigate to **AWS App Runner**.
-2. Click **Create service**.
-3. Under **Source**:
-   - Select **Source code repository**.
-   - Under **Connect to GitHub**, connect your GitHub account and select your repository (`Aivar_Hackathon_AWS_22PD10`).
-   - Select Branch: `main`.
-   - Deployment trigger: Choose **Automatic** (deploys on every git push).
-4. Under **Build settings**:
-   - Select **Use a configuration file** (AWS App Runner will automatically detect `apprunner.yaml`).
+### Step 2: Create AWS Elastic Beanstalk Environment
+1. In the **AWS Console**, navigate to **AWS Elastic Beanstalk** > **Create application**.
+2. **Name**: `agent-compliance-card-generator`.
+3. **Platform**: `Python 3.11` on Amazon Linux 2023.
+4. **Environment properties**: Add `DATABASE_URL`, `GROQ_API_KEY`, and `LOG_LEVEL`.
+5. Click **Submit** to launch the environment.
 
-### Step 3: Configure Environment Variables
-Under **Configure service**:
-- **Service name**: `agent-compliance-card-generator`
-- **CPU & Memory**: `1 vCPU / 2 GB` (or `0.5 vCPU / 1 GB` for free tier testing)
-- Under **Environment variables**, add:
-  | Key | Value | Description |
-  | :--- | :--- | :--- |
-  | `DATABASE_URL` | `postgresql://...` | Neon PostgreSQL cloud DB URL |
-  | `GROQ_API_KEY` | `gsk_...` | Your Groq API Key |
-  | `LOG_LEVEL` | `INFO` | Logging verbosity level |
+### Step 3: Create Automated AWS CodePipeline
+1. Navigate to **AWS CodePipeline** > **Create pipeline**.
+2. **Category**: Choose **Build custom pipeline**.
+3. **Source**: Select **GitHub (via GitHub App)**, connect your repo (`PoorvikaGowda23/Aivar_Hackathon_AWS_22PD10`), Branch: `main`.
+4. **Build stage**: Click **Skip build stage**.
+5. **Deploy stage**: Select **AWS Elastic Beanstalk**, choose Application and Environment.
+6. Click **Create pipeline**.
 
-### Step 4: Configure Health Check
-- **Protocol**: `HTTP`
-- **Path**: `/health`
-- **Port**: `8000`
-
-### Step 5: Review & Deploy
-Click **Create & Deploy**. AWS App Runner will automatically pull the code, install dependencies via `pip install -r requirements.txt`, start `uvicorn`, and assign a public HTTPS URL.
+Every `git push origin main` will now automatically build and deploy your governance service on AWS!
 
 ---
 
@@ -186,5 +168,5 @@ Click **Create & Deploy**. AWS App Runner will automatically pull the code, inst
 
 - ✅ 100% test coverage across 16 automated unit & end-to-end integration tests.
 - ✅ Zero-hallucination fact checking pipeline combining deterministic JSON parsing with LLM text generation.
-- ✅ Fully deployed on Render.com connected to a Neon Cloud PostgreSQL database.
+- ✅ Fully deployed on AWS Elastic Beanstalk (via AWS CodePipeline GitHub CI/CD) connected to a Neon Cloud PostgreSQL database.
 - ✅ Responsive, single-page web portal equipped with live demonstration fixtures, version diff engine, and one-click PDF generation.
