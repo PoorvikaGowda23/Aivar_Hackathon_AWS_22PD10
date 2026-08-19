@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Compliance Card Generator | EU AI Act & NIST RMF Portal</title>
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #334155;
+      --accent-blue: #38bdf8;
+      --accent-indigo: #6366f1;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --glass-bg: rgba(30, 41, 59, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.15) 0px, transparent 50%);
+    }
+
+    /* ── Header Navbar ── */
+    header {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 1rem;
+      overflow-x: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      white-space: nowrap;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      flex-shrink: 0;
+    }
+
+    .brand i {
+      font-size: 1.4rem;
+      color: #38bdf8;
+      -webkit-text-fill-color: initial;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      color: var(--text-main);
+      background: var(--bg-card-hover);
+    }
+
+    .badge-live {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--accent-emerald);
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge-live .pulse {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulseAnim 1.5s infinite;
+    }
+
+    @keyframes pulseAnim {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* ── Main Container ── */
+    main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* ── Hero Section ── */
+    .hero {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 720px;
+      margin: 0 auto 1.5rem auto;
+      line-height: 1.6;
+    }
+
+    .framework-pills {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      color: var(--accent-blue);
+      font-weight: 500;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* ── Badges ── */
+    .badge-impact {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .badge-warning {
+      background: rgba(244, 63, 94, 0.15);
+      color: #f43f5e;
+      border: 1px solid rgba(244, 63, 94, 0.4);
+    }
+
+    .badge-info {
+      background: rgba(148, 163, 184, 0.15);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    /* ── Stats Bar ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      padding: 1.25rem 1.5rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--accent-indigo);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+    }
+
+    .stat-info h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .stat-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Tab Views ── */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ── Upload & Generator Box ── */
+    .card-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .panel-header {
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .upload-grid { grid-template-columns: 1fr; }
+    }
+
+    .file-box {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.5);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .file-box:hover {
+      border-color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.05);
+    }
+
+    .file-box i {
+      font-size: 2rem;
+      color: var(--accent-indigo);
+      margin-bottom: 0.75rem;
+    }
+
+    .file-box h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .file-box p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .file-box input[type="file"] {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-status {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--accent-emerald);
+      font-weight: 600;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      padding: 0.75rem 1.75rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue));
+      color: white;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    /* ── Live Card View ── */
+    #document-iframe {
+      width: 100%;
+      height: 750px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: white;
+    }
+
+    /* ── Table Styling ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    tr:hover {
+      background: var(--bg-card-hover);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border-color);
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation Header ── -->
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>Agent Compliance Portal</span>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="switchTab('tab-generate')">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Card
+      </button>
+      <button class="nav-btn" onclick="switchTab('tab-viewer')">
+        <i class="fa-solid fa-file-invoice"></i> Card Viewer
+      </button>
+      <button class="nav-btn" onclick="switchTab('tab-diff')">
+        <i class="fa-solid fa-code-compare"></i> Version Diff
+      </button>
+      <button class="nav-btn" onclick="switchTab('tab-history')">
+        <i class="fa-solid fa-clock-rotate-left"></i> Agent Registry
+      </button>
+      <a href="/docs" target="_blank" class="nav-btn">
+        <i class="fa-solid fa-code"></i> API Docs (/docs)
+      </a>
+      <div class="badge-live" id="health-badge">
+        <span class="pulse"></span> <span id="health-status">System Healthy</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ── Hero Banner ── -->
+    <div class="hero">
+      <h1>AI Agent Compliance Card Generator</h1>
+      <p>Automated, regulation-aligned compliance cards for autonomous AI agents. Grounded in deterministic fact extraction and powered by LLaMA 3.3 70B on Groq.</p>
+      <div class="framework-pills">
+        <span class="pill"><i class="fa-solid fa-scale-balanced"></i> EU AI Act (Art. 13 & 14)</span>
+        <span class="pill"><i class="fa-solid fa-shield-cat"></i> NIST AI RMF (GOVERN & MAP)</span>
+        <span class="pill"><i class="fa-solid fa-stamp"></i> ISO/IEC 42001:2023</span>
+        <span class="pill"><i class="fa-solid fa-database"></i> Neon Cloud Postgres</span>
+      </div>
+    </div>
+
+    <!-- ── Stats Bar ── -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-robot"></i></div>
+        <div class="stat-info">
+          <h3 id="stat-agents">--</h3>
+          <p>Registered Agents</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="color: var(--accent-emerald); background: rgba(16,185,129,0.15);">
+          <i class="fa-solid fa-file-shield"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="stat-cards">--</h3>
+          <p>Total Card Versions</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="color: var(--accent-amber); background: rgba(245,158,11,0.15);">
+          <i class="fa-solid fa-server"></i>
+        </div>
+        <div class="stat-info">
+          <h3>Neon Postgres</h3>
+          <p>Cloud Storage Active</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="color: var(--accent-blue); background: rgba(56,189,248,0.15);">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div class="stat-info">
+          <h3>Groq LLaMA 3.3</h3>
+          <p>LLM Extraction Engine</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tab 1: Live Generator ── -->
+    <div id="tab-generate" class="tab-content active">
+      <div class="card-panel">
+        
+        <!-- 🎮 1-Click Judge Evaluation Simulator Bar -->
+        <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem;">
+            <h4 style="font-family:'Outfit', sans-serif; font-size:1.05rem; color:#818cf8; display:flex; align-items:center; gap:0.5rem;">
+              <i class="fa-solid fa-gamepad"></i> Agent Artifact Simulator:
+            </h4>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Select a preset agent profile to auto-fill JSON inputs</span>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+            <button type="button" class="btn btn-secondary" onclick="simulateAgent('support')" style="justify-content:flex-start; text-align:left; font-size:0.85rem; padding:0.6rem 0.85rem;">
+              <i class="fa-solid fa-headset" style="color:var(--accent-blue);"></i> Customer Support
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="simulateAgent('refund')" style="justify-content:flex-start; text-align:left; font-size:0.85rem; padding:0.6rem 0.85rem;">
+              <i class="fa-solid fa-money-bill-transfer" style="color:var(--accent-emerald);"></i> Financial Refund
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="simulateAgent('triage')" style="justify-content:flex-start; text-align:left; font-size:0.85rem; padding:0.6rem 0.85rem;">
+              <i class="fa-solid fa-user-doctor" style="color:var(--accent-rose);"></i> Healthcare Triage
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="simulateAgent('trading')" style="justify-content:flex-start; text-align:left; font-size:0.85rem; padding:0.6rem 0.85rem;">
+              <i class="fa-solid fa-chart-line" style="color:var(--accent-amber);"></i> Automated Trading
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-header">
+          <div class="panel-title"><i class="fa-solid fa-cloud-arrow-up"></i> Upload or Simulate Agent Artifacts</div>
+        </div>
+
+        <form id="generate-form">
+          <div class="upload-grid">
+            <div class="file-box">
+              <i class="fa-solid fa-sliders"></i>
+              <h4>1. agent_config.json</h4>
+              <p>Metadata, risk class & decision authority</p>
+              <input type="file" id="config-file" accept=".json" required onchange="updateFileLabel('config-file', 'config-status')">
+              <div class="file-status" id="config-status"></div>
+            </div>
+
+            <div class="file-box">
+              <i class="fa-solid fa-toolbox"></i>
+              <h4>2. tool_manifest.json</h4>
+              <p>Tool inventory, operations & data scope</p>
+              <input type="file" id="manifest-file" accept=".json" required onchange="updateFileLabel('manifest-file', 'manifest-status')">
+              <div class="file-status" id="manifest-status"></div>
+            </div>
+
+            <div class="file-box">
+              <i class="fa-solid fa-list-check"></i>
+              <h4>3. run_trace.json</h4>
+              <p>Execution logs and runtime traces</p>
+              <input type="file" id="trace-file" accept=".json" required onchange="updateFileLabel('trace-file', 'trace-status')">
+              <div class="file-status" id="trace-status"></div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button type="submit" class="btn btn-primary" id="btn-generate">
+              <div class="spinner" id="gen-spinner"></div>
+              <i class="fa-solid fa-bolt" id="gen-icon"></i> Generate & Persist Card
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── Tab 2: Document Viewer ── -->
+    <div id="tab-viewer" class="tab-content">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fa-solid fa-file-contract"></i> Compliance Card Document</div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" onclick="refreshIframe()">
+              <i class="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+          </div>
+        </div>
+        <iframe id="document-iframe" src="about:blank"></iframe>
+      </div>
+    </div>
+
+    <!-- ── Tab 3: Version Diff Engine ── -->
+    <div id="tab-diff" class="tab-content">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fa-solid fa-code-compare"></i> Card Version Diff Engine</div>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.9rem;">
+          Compare two card versions field-by-field. Changes in tool inventory, data sources, decision authority, or risk classification are automatically flagged as requiring regulatory re-assessment.
+        </p>
+
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: flex-end; flex-wrap: wrap;">
+          <div>
+            <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.4rem;">Agent ID</label>
+            <input type="text" id="diff-agent-id" value="agent-cs-001" style="background:var(--bg-dark); border:1px solid var(--border-color); color:white; padding:0.6rem 1rem; border-radius:8px; font-size:0.9rem;">
+          </div>
+          <div>
+            <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.4rem;">From Version</label>
+            <input type="number" id="diff-from" value="1" min="1" style="background:var(--bg-dark); border:1px solid var(--border-color); color:white; padding:0.6rem 1rem; border-radius:8px; font-size:0.9rem; width:100px;">
+          </div>
+          <div>
+            <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.4rem;">To Version</label>
+            <input type="number" id="diff-to" value="2" min="1" style="background:var(--bg-dark); border:1px solid var(--border-color); color:white; padding:0.6rem 1rem; border-radius:8px; font-size:0.9rem; width:100px;">
+          </div>
+          <button class="btn btn-primary" onclick="runDiff()">
+            <i class="fa-solid fa-code-compare"></i> Compare Card Versions
+          </button>
+        </div>
+
+        <!-- Results Banner -->
+        <div id="diff-banner" style="display:none; margin-bottom:1.5rem; padding:1rem 1.25rem; border-radius:10px; font-size:0.95rem;"></div>
+
+        <!-- Diff Results Table -->
+        <div id="diff-results" style="display:none;">
+          <table>
+            <thead>
+              <tr>
+                <th>Field Name</th>
+                <th>Previous Value (v<span id="label-from">1</span>)</th>
+                <th>Updated Value (v<span id="label-to">2</span>)</th>
+                <th>Regulatory Impact</th>
+              </tr>
+            </thead>
+            <tbody id="diff-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tab 4: Registry / History ── -->
+    <div id="tab-history" class="tab-content">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fa-solid fa-folder-tree"></i> Registered Agents & Versions</div>
+          <button class="btn btn-secondary" onclick="loadRegistry()">
+            <i class="fa-solid fa-rotate"></i> Reload Table
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Agent ID</th>
+              <th>Agent Name</th>
+              <th>Latest Version</th>
+              <th>Total Versions</th>
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="registry-table-body">
+            <tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Loading registry...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Agent Compliance Card Generator — Built for AI Agent Governance Hackathon 2026</p>
+    <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #64748b;">EU AI Act Art. 13/14 • NIST AI RMF • ISO/IEC 42001 • Neon Postgres • Groq LLaMA 3.3 70B</p>
+  </footer>
+
+  <script>
+    let currentAgentId = "agent-cs-001";
+
+    // Agent Simulator Profiles (100% Reliable Client-Side Injection)
+    const SIMULATOR_PROFILES = {
+      support: {
+        config: {
+          agent_id: "agent-cs-001",
+          agent_name: "Customer Support Agent",
+          llm: { provider: "Groq", model_name: "llama-3.3-70b-versatile", version: "3.3", hosting: "Groq Cloud" },
+          decision_authority: "advisory",
+          risk_classification: "limited",
+          data_sources: [
+            { name: "Customer Ticket DB", data_type: "Postgres", sensitivity: "internal" },
+            { name: "Knowledge Base Docs", data_type: "Vector Index", sensitivity: "public" }
+          ],
+          human_oversight: [{ description: "Human agent reviews and approves response before sending.", trigger: "Urgent tickets" }],
+          incident_contact: { name: "AI Ops Escalation Team", email: "ai-ops@example.com", escalation_path: "Slack #ai-alerts" }
+        },
+        manifest: {
+          tools: [
+            { name: "ticket_reader", description: "Fetches customer support tickets", operations: ["read"], data_accessed: ["tickets"] },
+            { name: "knowledge_search", description: "Queries vector search", operations: ["search"], data_accessed: ["kb_docs"] },
+            { name: "reply_draft_writer", description: "Saves draft responses", operations: ["write"], data_accessed: ["crm_drafts"] }
+          ]
+        },
+        trace: {
+          trace_id: "tr-support-001",
+          execution_steps: [
+            { step: 1, event: "user_prompt", content: "Customer T-8820 asks about refund SLA." },
+            { step: 2, event: "tool_call", tool_name: "ticket_reader", input: { ticket_id: "T-8820" }, output: { status: "open" } },
+            { step: 3, event: "llm_completion", content: "Drafted explanation of 3-5 days refund SLA." }
+          ]
+        }
+      },
+      refund: {
+        config: {
+          agent_id: "agent-fin-002",
+          agent_name: "Financial Refund Autonomous Agent",
+          llm: { provider: "Groq", model_name: "llama-3.3-70b-versatile", version: "3.3", hosting: "Groq Cloud" },
+          decision_authority: "autonomous",
+          risk_classification: "high",
+          data_sources: [
+            { name: "Banking Ledger API", data_type: "REST API", sensitivity: "confidential" },
+            { name: "Customer PII Database", data_type: "SQL", sensitivity: "PII" }
+          ],
+          human_oversight: [{ description: "Transactions above $1,000 hold for CFO approval.", trigger: "Amount > $1000" }],
+          incident_contact: { name: "Financial Risk Team", email: "fin-risk@example.com", escalation_path: "PagerDuty Tier 1" }
+        },
+        manifest: {
+          tools: [
+            { name: "bank_refund_api", description: "Executes direct bank transfers", operations: ["execute", "write"], data_accessed: ["ledger_accounts"] },
+            { name: "fraud_score_check", description: "Evaluates transaction fraud risk", operations: ["read"], data_accessed: ["fraud_logs"] }
+          ]
+        },
+        trace: {
+          trace_id: "tr-refund-002",
+          execution_steps: [
+            { step: 1, event: "user_prompt", content: "Process refund of $450 for order #9921." },
+            { step: 2, event: "tool_call", tool_name: "fraud_score_check", input: { amount: 450 }, output: { score: 0.02, status: "low_risk" } },
+            { step: 3, event: "tool_call", tool_name: "bank_refund_api", input: { amount: 450 }, output: { transaction_id: "tx_8839201" } }
+          ]
+        }
+      },
+      triage: {
+        config: {
+          agent_id: "agent-med-003",
+          agent_name: "Healthcare Clinical Triage Agent",
+          llm: { provider: "Groq", model_name: "llama-3.3-70b-versatile", version: "3.3", hosting: "Groq Cloud" },
+          decision_authority: "advisory",
+          risk_classification: "high",
+          data_sources: [
+            { name: "Electronic Health Records (EHR)", data_type: "FHIR API", sensitivity: "PII" }
+          ],
+          human_oversight: [{ description: "Licensed physician must sign off on triage recommendation.", trigger: "All non-routine triage" }],
+          incident_contact: { name: "Clinical Safety Officer", email: "safety@hospital.org", escalation_path: "Hospital Emergency Line" }
+        },
+        manifest: {
+          tools: [
+            { name: "ehr_reader", description: "Retrieves patient medical history", operations: ["read"], data_accessed: ["medical_history"] },
+            { name: "symptom_analyzer", description: "Evaluates symptom urgency scores", operations: ["execute"], data_accessed: ["clinical_rules"] }
+          ]
+        },
+        trace: {
+          trace_id: "tr-med-003",
+          execution_steps: [
+            { step: 1, event: "user_prompt", content: "Patient reports acute chest tightness and shortness of breath." },
+            { step: 2, event: "tool_call", tool_name: "symptom_analyzer", input: { symptoms: ["chest tightness"] }, output: { urgency: "high" } },
+            { step: 3, event: "llm_completion", content: "Flagged for immediate ER evaluation; routed to attending physician." }
+          ]
+        }
+      },
+      trading: {
+        config: {
+          agent_id: "agent-trade-004",
+          agent_name: "Automated Algorithmic Trading Agent",
+          llm: { provider: "Groq", model_name: "llama-3.3-70b-versatile", version: "3.3", hosting: "Groq Cloud" },
+          decision_authority: "autonomous",
+          risk_classification: "high",
+          data_sources: [
+            { name: "Market Live Ticker Feed", data_type: "WebSocket", sensitivity: "public" }
+          ],
+          human_oversight: [{ description: "Automatic circuit breaker halts trading if portfolio drawdown exceeds 2%.", trigger: "Drawdown > 2%" }],
+          incident_contact: { name: "Trading Desk Controller", email: "trading-ops@fund.com", escalation_path: "Direct Phone Line" }
+        },
+        manifest: {
+          tools: [
+            { name: "market_order_executor", description: "Places live stock/crypto market orders", operations: ["execute", "write"], data_accessed: ["brokerage_account"] }
+          ]
+        },
+        trace: {
+          trace_id: "tr-trade-004",
+          execution_steps: [
+            { step: 1, event: "user_prompt", content: "Signal detected: Buy 500 shares of NVDA at market." },
+            { step: 2, event: "tool_call", tool_name: "market_order_executor", input: { symbol: "NVDA", qty: 500 }, output: { filled: 500, price: 128.50 } }
+          ]
+        }
+      }
+    };
+
+    function simulateAgent(profileKey) {
+      const profile = SIMULATOR_PROFILES[profileKey];
+      if (!profile) return;
+
+      const configFile = new File([JSON.stringify(profile.config, null, 2)], `${profile.config.agent_id}_config.json`, { type: "application/json" });
+      const manifestFile = new File([JSON.stringify(profile.manifest, null, 2)], `${profile.config.agent_id}_manifest.json`, { type: "application/json" });
+      const traceFile = new File([JSON.stringify(profile.trace, null, 2)], `${profile.config.agent_id}_trace.json`, { type: "application/json" });
+
+      const setFileInput = (inputId, statusId, file) => {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        const input = document.getElementById(inputId);
+        input.files = dt.files;
+        document.getElementById(statusId).innerText = "✓ Simulated " + file.name;
+      };
+
+      setFileInput('config-file', 'config-status', configFile);
+      setFileInput('manifest-file', 'manifest-status', manifestFile);
+      setFileInput('trace-file', 'trace-status', traceFile);
+
+      alert(`🤖 Simulator Loaded Profile: '${profile.config.agent_name}'!\n\nAll 3 JSON files have been generated and attached. Click 'Generate & Persist Card' to run the evaluation!`);
+    }
+
+    // Switch Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      
+      const btnMap = {
+        'tab-generate': 0,
+        'tab-viewer': 1,
+        'tab-diff': 2,
+        'tab-history': 3
+      };
+      if (btnMap[tabId] !== undefined) {
+        document.querySelectorAll('.nav-btn')[btnMap[tabId]].classList.add('active');
+      }
+
+      if (tabId === 'tab-viewer' && currentAgentId) {
+        document.getElementById('document-iframe').src = `/agents/cards/${currentAgentId}/document`;
+      }
+      if (tabId === 'tab-history') {
+        loadRegistry();
+      }
+    }
+
+    function updateFileLabel(inputId, statusId) {
+      const input = document.getElementById(inputId);
+      const status = document.getElementById(statusId);
+      if (input.files.length > 0) {
+        status.innerText = "✓ " + input.files[0].name;
+      }
+    }
+
+    function refreshIframe() {
+      if (currentAgentId) {
+        document.getElementById('document-iframe').src = `/agents/cards/${currentAgentId}/document?t=` + new Date().getTime();
+      }
+    }
+
+    // Version Diff Engine Runner
+    async function runDiff() {
+      const agentId = document.getElementById('diff-agent-id').value;
+      const vFrom = document.getElementById('diff-from').value;
+      const vTo = document.getElementById('diff-to').value;
+
+      try {
+        const res = await fetch(`/agents/cards/${agentId}/diff?from=${vFrom}&to=${vTo}`);
+        if (!res.ok) {
+          const err = await res.json();
+          alert(err.detail || 'Failed to compare versions');
+          return;
+        }
+        const data = await res.json();
+
+        document.getElementById('label-from').innerText = vFrom;
+        document.getElementById('label-to').innerText = vTo;
+
+        const banner = document.getElementById('diff-banner');
+        banner.style.display = 'block';
+
+        if (data.requires_reassessment) {
+          banner.style.background = 'rgba(244, 63, 94, 0.15)';
+          banner.style.border = '1px solid rgba(244, 63, 94, 0.4)';
+          banner.style.color = '#f43f5e';
+          banner.innerHTML = `<strong>⚠️ REGULATORY RE-ASSESSMENT REQUIRED:</strong> Changes detected in key compliance fields: <code>${data.regulatory_changes.join(', ')}</code>. An updated EU AI Act / NIST risk assessment is mandatory before deployment.`;
+        } else {
+          banner.style.background = 'rgba(16, 185, 129, 0.15)';
+          banner.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+          banner.style.color = '#10b981';
+          banner.innerHTML = `<strong>✅ MINOR UPDATES ONLY:</strong> ${data.total_changes} field(s) changed. No regulatory re-assessment required.`;
+        }
+
+        const tbody = document.getElementById('diff-table-body');
+        tbody.innerHTML = '';
+
+        if (Object.keys(data.changes).length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No field changes found between these two versions.</td></tr>';
+        } else {
+          for (const [field, change] of Object.entries(data.changes)) {
+            const tr = document.createElement('tr');
+            const regBadge = change.requires_regulatory_reassessment
+              ? '<span class="badge-impact badge-warning">⚠️ Regulatory Impact</span>'
+              : '<span class="badge-impact badge-info">Minor Change</span>';
+
+            tr.innerHTML = `
+              <td><code>${field}</code></td>
+              <td style="color:#f87171;"><pre style="white-space:pre-wrap; font-size:0.8rem;">${JSON.stringify(change.from, null, 2)}</pre></td>
+              <td style="color:#4ade80;"><pre style="white-space:pre-wrap; font-size:0.8rem;">${JSON.stringify(change.to, null, 2)}</pre></td>
+              <td>${regBadge}</td>
+            `;
+            tbody.appendChild(tr);
+          }
+        }
+        document.getElementById('diff-results').style.display = 'block';
+      } catch (e) {
+        alert('Error running version diff: ' + e.message);
+      }
+    }
+
+    // Load Stats & Registry
+    async function loadRegistry() {
+      try {
+        const res = await fetch('/agents');
+        const data = await res.json();
+        
+        document.getElementById('stat-agents').innerText = data.count || 0;
+        let totalVersions = 0;
+
+        const tbody = document.getElementById('registry-table-body');
+        tbody.innerHTML = '';
+
+        if (!data.agents || data.agents.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No compliance cards stored yet. Generate one above!</td></tr>';
+          return;
+        }
+
+        data.agents.forEach(agent => {
+          totalVersions += agent.total_versions || 1;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><code>${agent.agent_id}</code></td>
+            <td><strong>${agent.agent_name}</strong></td>
+            <td><span class="pill" style="padding:0.2rem 0.6rem;">v${agent.latest_version}</span></td>
+            <td>${agent.total_versions}</td>
+            <td><small>${agent.created_at || 'Just now'}</small></td>
+            <td>
+              <button class="btn btn-secondary" style="padding:0.3rem 0.75rem; font-size:0.8rem;" onclick="viewCard('${agent.agent_id}')">
+                <i class="fa-solid fa-eye"></i> View HTML Card
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById('stat-cards').innerText = totalVersions;
+      } catch (err) {
+        console.error('Failed to load registry:', err);
+      }
+    }
+
+    function viewCard(agentId) {
+      currentAgentId = agentId;
+      switchTab('tab-viewer');
+    }
+
+    // Form Submit Handler
+    document.getElementById('generate-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const configInput = document.getElementById('config-file');
+      const manifestInput = document.getElementById('manifest-file');
+      const traceInput = document.getElementById('trace-file');
+
+      if (!configInput.files[0] || !manifestInput.files[0] || !traceInput.files[0]) {
+        alert('Please select all 3 JSON files first.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('config_file', configInput.files[0]);
+      formData.append('manifest_file', manifestInput.files[0]);
+      formData.append('trace_file', traceInput.files[0]);
+
+      // UI Loading state
+      const spinner = document.getElementById('gen-spinner');
+      const icon = document.getElementById('gen-icon');
+      const btn = document.getElementById('btn-generate');
+      
+      spinner.style.display = 'inline-block';
+      icon.style.display = 'none';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/agents/cards/generate', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Card generation failed.');
+        }
+
+        const data = await res.json();
+        currentAgentId = data.agent_id;
+        
+        alert(`Success! Generated Compliance Card for '${data.agent_name}' (Version v${data.version}) persisted to Neon Postgres.`);
+        
+        // Switch to Document View
+        switchTab('tab-viewer');
+        loadRegistry();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        spinner.style.display = 'none';
+        icon.style.display = 'inline-block';
+        btn.disabled = false;
+      }
+    });
+
+    // Health Check Status
+    async function checkHealth() {
+      try {
+        const res = await fetch('/health');
+        const data = await res.json();
+        if (data.status === 'healthy') {
+          document.getElementById('health-status').innerText = 'System Healthy';
+        } else {
+          document.getElementById('health-status').innerText = 'Degraded';
+        }
+      } catch (e) {
+        document.getElementById('health-status').innerText = 'Offline';
+      }
+    }
+
+    // Initial load
+    checkHealth();
+    loadRegistry();
+  </script>
+</body>
+</html>
