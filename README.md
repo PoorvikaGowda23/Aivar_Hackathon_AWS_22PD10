@@ -79,7 +79,7 @@ flowchart TD
 - **LLM Engine**: Groq API (LLaMA 3.3 70B Versatile)
 - **Templating**: Jinja2 & Vanilla HTML5/CSS3/JS (Glassmorphism design system)
 - **Testing**: Pytest & HTTPX 
-- **Cloud Deployment**: Render.com Web Services
+- **Cloud Deployment**: AWS App Runner (Native Python Source Code Deployment via GitHub Integration)
 
 ---
 
@@ -120,6 +120,50 @@ Access local portal at `http://localhost:8000` and Swagger UI at `http://localho
 ```bash
 pytest tests/ -v
 ```
+
+---
+
+## ☁️ AWS App Runner Deployment Guide (GitHub Source Code — No Docker)
+
+Follow these steps to deploy the application directly to **AWS App Runner** from your GitHub repository:
+
+### Step 1: Push Repository to GitHub
+Ensure your repository contains the [`apprunner.yaml`](file:///c:/Users/user/Desktop/VSC%20Folder/Aivar_Hackathon_AWS_22PD10/apprunner.yaml) file:
+```bash
+git add apprunner.yaml
+git commit -m "Add AWS App Runner configuration"
+git push origin main
+```
+
+### Step 2: Create AWS App Runner Service
+1. Log into the **AWS Management Console** and navigate to **AWS App Runner**.
+2. Click **Create service**.
+3. Under **Source**:
+   - Select **Source code repository**.
+   - Under **Connect to GitHub**, connect your GitHub account and select your repository (`Aivar_Hackathon_AWS_22PD10`).
+   - Select Branch: `main`.
+   - Deployment trigger: Choose **Automatic** (deploys on every git push).
+4. Under **Build settings**:
+   - Select **Use a configuration file** (AWS App Runner will automatically detect `apprunner.yaml`).
+
+### Step 3: Configure Environment Variables
+Under **Configure service**:
+- **Service name**: `agent-compliance-card-generator`
+- **CPU & Memory**: `1 vCPU / 2 GB` (or `0.5 vCPU / 1 GB` for free tier testing)
+- Under **Environment variables**, add:
+  | Key | Value | Description |
+  | :--- | :--- | :--- |
+  | `DATABASE_URL` | `postgresql://...` | Neon PostgreSQL cloud DB URL |
+  | `GROQ_API_KEY` | `gsk_...` | Your Groq API Key |
+  | `LOG_LEVEL` | `INFO` | Logging verbosity level |
+
+### Step 4: Configure Health Check
+- **Protocol**: `HTTP`
+- **Path**: `/health`
+- **Port**: `8000`
+
+### Step 5: Review & Deploy
+Click **Create & Deploy**. AWS App Runner will automatically pull the code, install dependencies via `pip install -r requirements.txt`, start `uvicorn`, and assign a public HTTPS URL.
 
 ---
 

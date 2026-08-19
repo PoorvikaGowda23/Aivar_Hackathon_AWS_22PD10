@@ -1,0 +1,24 @@
+# Environment variables
+.env
+*.env
+
+# Virtual environments
+venv/
+myenv/
+ENV/
+env/
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases
+*.db
+cards.db
+test_stage10.db
+
+# Pytest & IDE
+.pytest_cache/
+.vscode/
+.idea/
