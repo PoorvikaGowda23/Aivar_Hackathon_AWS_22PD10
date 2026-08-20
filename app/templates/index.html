@@ -1022,15 +1022,15 @@
             <td><small>${agent.created_at || 'Just now'}</small></td>
             <td>
               <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                <a href="/agents/cards/${agent.agent_id}/document" target="_blank" class="btn btn-secondary" style="padding:0.3rem 0.65rem; font-size:0.8rem; text-decoration:none;">
+                  <i class="fa-solid fa-up-right-from-square"></i> View HTML
+                </a>
                 <button class="btn btn-secondary" style="padding:0.3rem 0.65rem; font-size:0.8rem;" onclick="viewCard('${agent.agent_id}')">
-                  <i class="fa-solid fa-eye"></i> View HTML
+                  <i class="fa-solid fa-eye"></i> Card Preview
                 </button>
                 <button class="btn btn-secondary" style="padding:0.3rem 0.65rem; font-size:0.8rem; background:rgba(99,102,241,0.15); color:#818cf8; border-color:rgba(99,102,241,0.3);" onclick="openAuditModal('${agent.agent_id}')">
                   <i class="fa-solid fa-brain"></i> AI Audit Review
                 </button>
-                <a href="/agents/cards/${agent.agent_id}/document" target="_blank" class="btn btn-secondary" style="padding:0.3rem 0.65rem; font-size:0.8rem; text-decoration:none;">
-                  <i class="fa-solid fa-print"></i> PDF / Print
-                </a>
               </div>
             </td>
           `;
