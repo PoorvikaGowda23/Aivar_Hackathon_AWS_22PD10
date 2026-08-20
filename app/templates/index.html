@@ -684,13 +684,14 @@
               <th>Agent Name</th>
               <th>Latest Version</th>
               <th>Compliance Score</th>
+              <th>Risk Level</th>
               <th>Total Versions</th>
               <th>Created At</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="registry-table-body">
-            <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Loading registry...</td></tr>
+            <tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Loading registry...</td></tr>
           </tbody>
         </table>
       </div>
@@ -998,15 +999,19 @@
         tbody.innerHTML = '';
 
         if (!data.agents || data.agents.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No compliance cards stored yet. Generate one above!</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No compliance cards stored yet. Generate one above!</td></tr>';
           return;
         }
 
         data.agents.forEach(agent => {
           totalVersions += agent.total_versions || 1;
           const scoreDisplay = agent.compliance_score !== undefined
-            ? `<span class="pill" style="background:rgba(15,23,42,0.8); border:1px solid var(--border-color); font-weight:700;">${agent.color_badge || '🟢'} ${agent.compliance_score}/100 (${agent.grade || 'A'})</span>`
+            ? `<span class="pill" style="background:rgba(15,23,42,0.8); border:1px solid var(--border-color); font-weight:700; color:#38bdf8;"><i class="fa-solid fa-chart-simple"></i> ${agent.compliance_score}/100 (Grade ${agent.grade || 'A'})</span>`
             : `<span class="pill">--</span>`;
+
+          const riskBadgeDisplay = agent.risk_level
+            ? `<span class="badge-impact" style="padding:0.35rem 0.75rem; font-size:0.8rem; font-weight:700; border-radius:9999px; background:${agent.risk_level === 'LOW_RISK' ? 'rgba(16,185,129,0.15)' : (agent.risk_level === 'MODERATE_RISK' ? 'rgba(245,158,11,0.15)' : 'rgba(244,63,94,0.15)')}; border:1px solid ${agent.risk_level === 'LOW_RISK' ? 'rgba(16,185,129,0.4)' : (agent.risk_level === 'MODERATE_RISK' ? 'rgba(245,158,11,0.4)' : 'rgba(244,63,94,0.4)')}; color:${agent.risk_level === 'LOW_RISK' ? '#10b981' : (agent.risk_level === 'MODERATE_RISK' ? '#f59e0b' : '#f43f5e')};">${agent.color_badge || '🟢'} ${(agent.risk_level || 'LOW_RISK').replace('_', ' ')}</span>`
+            : `<span class="badge-impact badge-info">🟢 LOW RISK</span>`;
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
@@ -1014,6 +1019,7 @@
             <td><strong>${agent.agent_name}</strong></td>
             <td><span class="pill" style="padding:0.2rem 0.6rem;">v${agent.latest_version}</span></td>
             <td>${scoreDisplay}</td>
+            <td>${riskBadgeDisplay}</td>
             <td>${agent.total_versions}</td>
             <td><small>${agent.created_at || 'Just now'}</small></td>
             <td>
