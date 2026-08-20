@@ -113,6 +113,22 @@ class AgentCard(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
 
 
+class AgentCardUpdate(BaseModel):
+    agent_name: Optional[str] = None
+    purpose_and_scope: Optional[str] = None
+    llm: Optional[LLMInfo] = None
+    tool_inventory: Optional[List[ToolEntry]] = None
+    data_sources: Optional[List[DataSource]] = None
+    decision_authority: Optional[DecisionAuthority] = None
+    human_oversight: Optional[List[HumanOversightMechanism]] = None
+    risk_classification: Optional[RiskClassification] = None
+    known_limitations: Optional[List[str]] = None
+    incident_contact: Optional[IncidentContact] = None
+
+    model_config = ConfigDict(use_enum_values=True)
+
+
+
 # ---------------------------------------------------------------------------
 # Quick manual check — run this file directly to confirm the schema works
 # before wiring it into anything else.

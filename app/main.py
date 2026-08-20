@@ -59,7 +59,8 @@ from llm_extractor import generate_audit_review
 from logging_config import setup_logging
 
 from regulation_mapper import annotate_card
-from schema import AgentCard
+from schema import AgentCard, AgentCardUpdate
+
 from scoring import calculate_compliance_score
 
 # ── Logger ─────────────────────────────────────────────────────────────────
@@ -491,6 +492,66 @@ def review_agent_card(
         raise HTTPException(status_code=500, detail=f"AI Audit Review generation failed: {exc}")
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# PATCH /agents/cards/{agent_id}
+# ══════════════════════════════════════════════════════════════════════════════
+
+@app.patch(
+    "/agents/cards/{agent_id}",
+    tags=["Cards"],
+    summary="Update specific fields on an existing card and save as a new immutable version",
+)
+def update_card(
+    agent_id: str,
+    payload: AgentCardUpdate,
+    db: Session = Depends(get_db),
+):
+    """
+    Updates one or more fields on the latest card version for agent_id.
+    Validates updated fields against AgentCard schema and persists as a new version (v+1).
+    """
+    latest = get_latest_card(db, agent_id)
+    if not latest:
+        raise HTTPException(404, detail=f"No existing card found for agent '{agent_id}' to update.")
+
+    card_dict = json.loads(latest.card_json)
+    update_data = payload.model_dump(exclude_unset=True)
+
+    if not update_data:
+        raise HTTPException(400, detail="No fields provided to update.")
+
+    # Merge update fields into existing card dictionary
+    for field, val in update_data.items():
+        if val is not None:
+            card_dict[field] = val
+
+    # Validate merged structure
+    try:
+        updated_card = AgentCard(**card_dict)
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"Card update validation failed: {exc}")
+
+    # Save as new version in DB
+    new_record = save_card(db, updated_card)
+    report = check_card(updated_card)
+    score = calculate_compliance_score(updated_card, report)
+
+    return {
+        "message": f"Agent '{agent_id}' updated successfully to version {new_record.version}.",
+        "agent_id": agent_id,
+        "previous_version": latest.version,
+        "new_version": new_record.version,
+        "score": score.model_dump(),
+        "completeness": {
+            "is_complete": report.is_complete,
+            "issue_count": len(report.issues),
+        },
+        "updated_fields": list(update_data.keys()),
+        "card": json.loads(export_json(updated_card)),
+    }
+
+
+
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -643,9 +704,10 @@ def diff_versions(
 # GET /
 # ══════════════════════════════════════════════════════════════════════════════
 
-from portal import PORTAL_HTML
+from portal import get_portal_html
 
 @app.get("/", response_class=HTMLResponse, tags=["Operations"], summary="Agent Compliance Portal Dashboard")
 def root():
     """Serves the interactive Agent Compliance Portal website."""
-    return HTMLResponse(content=PORTAL_HTML)
+    return HTMLResponse(content=get_portal_html())
+

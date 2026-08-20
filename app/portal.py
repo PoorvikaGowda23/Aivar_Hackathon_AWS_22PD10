@@ -9,10 +9,10 @@ from pathlib import Path
 
 _INDEX_HTML_PATH = Path(__file__).parent / "templates" / "index.html"
 
-if _INDEX_HTML_PATH.exists():
-    PORTAL_HTML = _INDEX_HTML_PATH.read_text(encoding="utf-8")
-else:
-    PORTAL_HTML = """<!DOCTYPE html>
+def get_portal_html() -> str:
+    if _INDEX_HTML_PATH.exists():
+        return _INDEX_HTML_PATH.read_text(encoding="utf-8")
+    return """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -31,3 +31,6 @@ else:
   <a href="/health" class="btn" style="background:#10b981;">Check System Health (/health)</a>
 </body>
 </html>"""
+
+PORTAL_HTML = get_portal_html()
+
