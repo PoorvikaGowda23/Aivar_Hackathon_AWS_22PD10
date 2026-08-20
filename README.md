@@ -33,23 +33,28 @@ flowchart TD
     B --> C[Pydantic Schema Validation]
     C --> D[Deterministic Fact Extractor]
     D --> E[Regulation Mapping Engine]
-    D --> F[Groq LLaMA 3.3 70B LLM Synthesizer]
+    D --> F[Groq LLM Narrative Synthesizer]
     E --> G[Compliance Card Orchestrator]
     F --> G
     G --> H[Fact Checker & Anti-Hallucination Guard]
     H --> I[Completeness Checker Engine]
-    I --> J[SQLAlchemy DB Persistence - Neon Cloud Postgres]
-    J --> K[Exporters: Structured JSON & Styled HTML Document]
-    K --> L[Version Diff Engine & Regulatory Impact Flagging]
+    I --> J[Quantifiable Scoring Engine]
+    J --> K[SQLAlchemy DB Persistence - Neon Cloud Postgres]
+    K --> L[Exporters: Structured JSON & Styled HTML Document]
+    K --> M[AI Regulatory Auditor Reviewer]
+    K --> N[Card Patching & Immutable Versioning]
+    N --> O[Version Diff Engine & Regulatory Impact Flagging]
 ```
 
 ### Core Pipeline Stages:
 1. **Deterministic Fact Extractor**: Extracts tool inventories, allowed operations (`read`, `write`, `execute`), data sensitivities (`PII`, `confidential`), decision authority (`advisory`, `autonomous`), human oversight triggers, and incident contacts directly from raw JSON input.
 2. **Regulation Mapper**: Rule-based engine mapping extracted agent capabilities to precise clauses in the EU AI Act (Art 13/14), NIST AI RMF, and ISO 42001.
-3. **Groq LLaMA 3.3 70B Extractor**: Synthesizes human-readable descriptions of intended use, operational boundaries, known limitations, and risk mitigations.
+3. **Groq LLM Narrative Synthesizer**: Synthesizes human-readable descriptions of intended use, operational boundaries, known limitations, and risk mitigations using Groq LLaMA 3.3 70B / Qwen.
 4. **Fact Checker & Guard**: Compares LLM output against deterministic facts to prevent hallucinations.
-5. **Rule-Based Completeness Checker**: Evaluates 10 mandatory fields and produces a completeness report with actionable warnings.
-6. **Card Version Diff Engine**: Compares multiple card versions (`v1` vs `v2`) field-by-field and flags changes in risk class, decision authority, data sources, or tool inventories as **`⚠️ REGULATORY RE-ASSESSMENT REQUIRED`**.
+5. **Rule-Based Completeness Checker**: Evaluates mandatory fields, identifies missing/null attributes, and detects placeholder tokens (`TBD`, `N/A`, `TODO`).
+6. **Quantifiable Compliance & Risk Scoring Engine**: Calculates a weighted 0-100 compliance score, assigns risk levels (`LOW_RISK`, `MODERATE_RISK`, `HIGH_RISK`), letter grades (`A+` to `F`), and color badges (🟢/🟡/🔴).
+7. **AI-Powered Regulatory Auditor**: Evaluates generated cards using Groq LLaMA 3.3 70B acting as a Senior AI Regulatory Auditor to produce structured audit reports, identify governance gaps, and issue remediation recommendations.
+8. **Immutable Versioning, Patching & Diff Engine**: Supports partial field updates via `PATCH` endpoints, creates immutable version records (`v1` -> `v2`), and flags changes in risk class, decision authority, data sources, or tool inventories as **`⚠️ REGULATORY RE-ASSESSMENT REQUIRED`**.
 
 ---
 
@@ -59,9 +64,12 @@ flowchart TD
 | :--- | :--- | :--- |
 | `GET` | `/` | Single-Page Web Portal & Interactive Dashboard |
 | `POST` | `/agents/cards/generate` | Upload 3 JSON files, run compliance pipeline, and persist card to database |
-| `GET` | `/agents` | List all registered agents and version metadata |
+| `GET` | `/agents` | List all registered agents with latest version, compliance score, risk level, grade & badge |
 | `GET` | `/agents/cards/{agent_id}` | Fetch latest card version in JSON format |
-| `GET` | `/agents/cards/{agent_id}/versions/{v}` | Fetch specific card version in JSON format |
+| `GET` | `/agents/cards/{agent_id}/versions/{version}` | Fetch specific card version in JSON format |
+| `GET` | `/agents/cards/{agent_id}/score` | Calculate weighted 0-100 compliance & risk score, grade, risk level, and pillar breakdown |
+| `POST` | `/agents/cards/{agent_id}/review` | Generate AI-powered regulatory audit review critique with Groq LLM |
+| `PATCH` | `/agents/cards/{agent_id}` | Update specific fields on an existing card and save as a new immutable version (`v+1`) |
 | `GET` | `/agents/cards/{agent_id}/document` | Render print-ready HTML Compliance Card document with CSS styling |
 | `GET` | `/agents/cards/{agent_id}/completeness` | Execute completeness report for a card |
 | `GET` | `/agents/cards/{agent_id}/diff?from=1&to=2` | Perform field-by-field version diff with regulatory re-assessment flags |
@@ -71,14 +79,80 @@ flowchart TD
 
 ---
 
+## 📊 Quantifiable Compliance & Risk Scoring Engine
+
+The system features a multi-pillar scoring engine (`app/scoring.py`) that evaluates each compliance card across 4 weighted pillars:
+
+| Pillar | Max Weight | Description |
+| :--- | :---: | :--- |
+| 📊 **Completeness** | **40 Points** | Field population and detection of missing attributes or placeholder tokens (`TBD`, `N/A`, `TODO`). |
+| 🛡️ **Governance & Oversight** | **30 Points** | Presence of defined human oversight mechanisms, explicit review triggers, and escalation contacts. |
+| 🔒 **Data Privacy & Protection** | **15 Points** | Safeguards for sensitive data categories (PII, confidential records) and tool data access scope. |
+| ⚡ **Operational Autonomy & Risk** | **15 Points** | Evaluation of decision authority level (`informational`, `advisory`, `autonomous`) vs risk tier. |
+
+### Scoring Grades & Badges:
+- 🟢 **LOW RISK (Score 90–100)**: Grades `A+` (97-100) and `A` (90-96) — Fully compliant with robust oversight.
+- 🟡 **MODERATE RISK (Score 60–89)**: Grades `B` (75-89) and `C` (60-74) — Minor completeness or oversight gaps.
+- 🔴 **HIGH RISK (Score 0–59)**: Grades `D` (40-59) and `F` (0-39) — Severe governance deficiencies or missing controls.
+
+---
+
+## 🤖 AI-Powered Regulatory Auditor Reviewer
+
+The system includes an automated **AI Regulatory Auditor** (`app/llm_extractor.py`) that critiques generated compliance cards against the EU AI Act and NIST AI RMF 1.0:
+
+- **EU AI Act Classification**: Evaluates system classification (e.g., High-Risk Article 6, Transparency Article 50).
+- **Governance Gap Identification**: Highlights structural risks, missing escalation paths, or uncontrolled autonomous capabilities.
+- **Actionable Remediation Roadmap**: Provides category-specific findings (`Human Oversight`, `Data Privacy`, `Operational Autonomy`, `Risk Mitigation`) with developer remediation steps.
+
+---
+
+## 📂 Repository Project Structure
+
+```
+Aivar_Hackathon_AWS_22PD10/
+├── app/
+│   ├── main.py              # FastAPI application, route handlers, middleware & health endpoints
+│   ├── generator.py         # Compliance Card generation pipeline orchestrator
+│   ├── parsers.py           # Deterministic JSON fact extractor
+│   ├── regulation_mapper.py # EU AI Act, NIST AI RMF & ISO 42001 rule mapping engine
+│   ├── llm_extractor.py     # Groq LLM narrative synthesizer & AI Regulatory Auditor reviewer
+│   ├── scoring.py           # Quantifiable 0-100 compliance & risk scoring engine
+│   ├── completeness.py      # Rule-based completeness & placeholder checker engine
+│   ├── document.py          # Structured JSON & print-ready HTML document exporters
+│   ├── schema.py            # Pydantic v2 domain schemas (AgentCard, Score, AuditReport, Patch)
+│   ├── models.py            # SQLAlchemy database models for immutable card versions
+│   ├── crud.py              # Database persistence layer & card history manager
+│   ├── database.py          # Dual DB connection engine (SQLite local / Neon Postgres cloud)
+│   ├── logging_config.py    # Structured JSON logger with request-ID correlation
+│   ├── portal.py           # Interactive single-page web portal dashboard
+│   └── templates/           # Jinja2 HTML templates & CSS design system
+├── tests/                   # Pytest test suite (22 unit & integration tests)
+│   ├── test_completeness.py
+│   ├── test_generator.py
+│   ├── test_parsers.py
+│   ├── test_patch.py
+│   ├── test_regulation_mapper.py
+│   ├── test_review.py
+│   ├── test_schema.py
+│   └── test_scoring.py
+├── fixtures/                # Test fixtures (simple, complex, incomplete agent inputs)
+├── .ebextensions/           # AWS Elastic Beanstalk configuration files
+├── Procfile                 # AWS Beanstalk application runner
+├── requirements.txt         # Production dependencies
+└── README.md                # Project documentation
+```
+
+---
+
 ## 🛠️ Technology Stack
 
 - **Backend Framework**: Python 3.10+, FastAPI, Uvicorn
 - **Data Validation**: Pydantic v2 
 - **Database Layer**: SQLAlchemy 2.0 (Dual DB support: SQLite for local dev, Neon Serverless PostgreSQL for production)
-- **LLM Engine**: Groq API (LLaMA 3.3 70B Versatile)
+- **LLM Engine**: Groq API (LLaMA 3.3 70B / Qwen 27B)
 - **Templating**: Jinja2 & Vanilla HTML5/CSS3/JS (Glassmorphism design system)
-- **Testing**: Pytest & HTTPX 
+- **Testing**: Pytest & HTTPX
 - **Cloud Deployment**: AWS Elastic Beanstalk (Python 3.11 Platform with AWS CodePipeline Automated CI/CD)
 
 ---
@@ -91,11 +165,11 @@ git clone https://github.com/PoorvikaGowda23/Aivar_Hackathon_AWS_22PD10.git
 cd Aivar_Hackathon_AWS_22PD10
 
 # Create virtual environment
-python -m venv myenv
+python -m venv venv
 # Activate on Windows:
-myenv\Scripts\activate
+venv\Scripts\activate
 # Activate on macOS/Linux:
-source myenv/bin/activate
+source venv/bin/activate
 ```
 
 ### 2. Install Dependencies
@@ -118,7 +192,7 @@ Access local portal at `http://localhost:8000` and Swagger UI at `http://localho
 
 ### 5. Run Test Suite
 ```bash
-pytest tests/ -v
+python -m pytest tests/ -v
 ```
 
 ---
@@ -166,7 +240,10 @@ Every `git push origin main` will now automatically build and deploy your govern
 
 ## 🏆 Project Accomplishments
 
-- ✅ 100% test coverage across 16 automated unit & end-to-end integration tests.
-- ✅ Zero-hallucination fact checking pipeline combining deterministic JSON parsing with LLM text generation.
-- ✅ Fully deployed on AWS Elastic Beanstalk (via AWS CodePipeline GitHub CI/CD) connected to a Neon Cloud PostgreSQL database.
-- ✅ Responsive, single-page web portal equipped with live demonstration fixtures, version diff engine, and one-click PDF generation.
+- ✅ **100% Core Engine Test Coverage**: 22 passing unit & integration tests across 8 test suites.
+- ✅ **Zero-Hallucination Guard**: Combines deterministic JSON parsing with LLM text generation and fact verification.
+- ✅ **Multi-Pillar Scoring Engine**: Quantifies compliance risk (0-100 score) across Completeness, Governance, Privacy, and Autonomy.
+- ✅ **AI Regulatory Auditor**: Automated senior auditor critique issuing EU AI Act risk tiers and actionable remediation steps.
+- ✅ **Immutable Card Patching & Versioning**: Enables partial field updates via `PATCH` while maintaining audit logs and version diffing.
+- ✅ **Production AWS Cloud Deployment**: Live on AWS Elastic Beanstalk via AWS CodePipeline GitHub CI/CD connected to Neon Serverless PostgreSQL.
+- ✅ **Interactive Portal & Exports**: Responsive glassmorphism web dashboard with JSON exports, version comparison, and print-ready HTML cards.
