@@ -58,6 +58,7 @@ from generator import generate_agent_card
 from logging_config import setup_logging
 from regulation_mapper import annotate_card
 from schema import AgentCard
+from scoring import calculate_compliance_score
 
 # ── Logger ─────────────────────────────────────────────────────────────────
 logger = setup_logging(level=os.getenv("LOG_LEVEL", "INFO"))
@@ -367,6 +368,7 @@ def generate(
 
     record = save_card(db, card)
     report = check_card(card)
+    score  = calculate_compliance_score(card, report)
 
     logger.info(
         "generate: card saved",
@@ -375,6 +377,7 @@ def generate(
             "agent_id":   card.agent_id,
             "version":    record.version,
             "complete":   report.is_complete,
+            "score":      score.overall_score,
         },
     )
 
@@ -383,6 +386,7 @@ def generate(
         "agent_name":   card.agent_name,
         "version":      record.version,
         "db_record_id": record.id,
+        "score":        score.model_dump(),
         "completeness": {
             "is_complete": report.is_complete,
             "issue_count": len(report.issues),
@@ -401,12 +405,55 @@ def generate(
 
 @app.get("/agents", tags=["Cards"], summary="List all agents stored in the database")
 def list_agents_route(db: Session = Depends(get_db)):
-    """Returns a summary of every agent_id with latest version and total version count."""
+    """Returns a summary of every agent_id with latest version, score, and version count."""
     agents = list_all_agents(db)
     for agent in agents:
         if agent.get("created_at"):
             agent["created_at"] = str(agent["created_at"])
+        latest = get_latest_card(db, agent["agent_id"])
+        if latest:
+            try:
+                card = AgentCard(**json.loads(latest.card_json))
+                score = calculate_compliance_score(card)
+                agent["compliance_score"] = score.overall_score
+                agent["risk_level"] = score.risk_level
+                agent["color_badge"] = score.color_badge
+                agent["grade"] = score.grade
+            except Exception:
+                agent["compliance_score"] = 0
+                agent["risk_level"] = "UNKNOWN"
+                agent["color_badge"] = "🔴"
+                agent["grade"] = "F"
     return {"count": len(agents), "agents": agents}
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# GET /agents/cards/{agent_id}/score
+# ══════════════════════════════════════════════════════════════════════════════
+
+@app.get(
+    "/agents/cards/{agent_id}/score",
+    tags=["Cards"],
+    summary="Get 0-100 compliance and risk score for an agent card",
+)
+def get_card_score(
+    agent_id: str,
+    version: Optional[int] = Query(None, description="Version to score (defaults to latest)"),
+    db: Session = Depends(get_db),
+):
+    """Calculates weighted 0-100 score, risk level, grade, category breakdown, strengths and penalties."""
+    record = (
+        get_card_by_version(db, agent_id, version)
+        if version is not None
+        else get_latest_card(db, agent_id)
+    )
+    if not record:
+        raise HTTPException(404, detail=f"No card found for agent '{agent_id}'.")
+
+    card  = AgentCard(**json.loads(record.card_json))
+    score = calculate_compliance_score(card)
+    return score.model_dump()
+
 
 
 # ══════════════════════════════════════════════════════════════════════════════
