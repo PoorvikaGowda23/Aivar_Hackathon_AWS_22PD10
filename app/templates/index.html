@@ -685,13 +685,12 @@
               <th>Latest Version</th>
               <th>Compliance Score</th>
               <th>Risk Level</th>
-              <th>Total Versions</th>
               <th>Created At</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="registry-table-body">
-            <tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Loading registry...</td></tr>
+            <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Loading registry...</td></tr>
           </tbody>
         </table>
       </div>
@@ -999,7 +998,7 @@
         tbody.innerHTML = '';
 
         if (!data.agents || data.agents.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No compliance cards stored yet. Generate one above!</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No compliance cards stored yet. Generate one above!</td></tr>';
           return;
         }
 
@@ -1020,7 +1019,6 @@
             <td><span class="pill" style="padding:0.2rem 0.6rem;">v${agent.latest_version}</span></td>
             <td>${scoreDisplay}</td>
             <td>${riskBadgeDisplay}</td>
-            <td>${agent.total_versions}</td>
             <td><small>${agent.created_at || 'Just now'}</small></td>
             <td>
               <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
