@@ -55,7 +55,9 @@ from crud import (
 from completeness import check_card
 from document import export_html, export_json
 from generator import generate_agent_card
+from llm_extractor import generate_audit_review
 from logging_config import setup_logging
+
 from regulation_mapper import annotate_card
 from schema import AgentCard
 from scoring import calculate_compliance_score
@@ -453,6 +455,41 @@ def get_card_score(
     card  = AgentCard(**json.loads(record.card_json))
     score = calculate_compliance_score(card)
     return score.model_dump()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# POST /agents/cards/{agent_id}/review
+# ══════════════════════════════════════════════════════════════════════════════
+
+@app.post(
+    "/agents/cards/{agent_id}/review",
+    tags=["Cards"],
+    summary="Generate an AI-powered regulatory audit review for an agent card",
+)
+def review_agent_card(
+    agent_id: str,
+    version: Optional[int] = Query(None, description="Version to review (defaults to latest)"),
+    db: Session = Depends(get_db),
+):
+    """Uses Groq LLaMA 3.3 70B as a Senior AI Regulatory Auditor to critique card data & score."""
+    record = (
+        get_card_by_version(db, agent_id, version)
+        if version is not None
+        else get_latest_card(db, agent_id)
+    )
+    if not record:
+        raise HTTPException(404, detail=f"No card found for agent '{agent_id}'.")
+
+    card_dict = json.loads(record.card_json)
+    card_obj = AgentCard(**card_dict)
+    score_obj = calculate_compliance_score(card_obj)
+
+    try:
+        report = generate_audit_review(card_dict, score_obj.model_dump())
+        return report.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"AI Audit Review generation failed: {exc}")
+
 
 
 

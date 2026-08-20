@@ -125,3 +125,123 @@ def generate_narrative_fields(
             continue
 
     raise RuntimeError("Unreachable")  # pragma: no cover
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Feature 3: AI Regulatory Auditor Review Models & Generator
+# ══════════════════════════════════════════════════════════════════════════════
+
+from datetime import datetime, timezone
+
+
+class AuditRecommendation(BaseModel):
+    category: str
+    severity: str
+    finding: str
+    remediation: str
+
+
+class AuditReport(BaseModel):
+    agent_id: str
+    eu_ai_act_tier: str
+    audit_summary: str
+    governance_gaps: List[str]
+    recommendations: List[AuditRecommendation]
+    audited_at: str = ""
+
+    def model_post_init(self, __context: Any) -> None:
+        if not self.audited_at:
+            self.audited_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+_AUDITOR_SYSTEM_PROMPT = """You are a Senior AI Regulatory Auditor performing an audit on an AI Agent Compliance Card grounded in the EU AI Act and NIST AI RMF 1.0.
+
+Respond with ONLY a JSON object, no markdown fences, no extra text, in this exact shape:
+{
+  "agent_id": "<agent_id>",
+  "eu_ai_act_tier": "<e.g. High-Risk (Art. 6) / Transparency Risk (Art. 50) / General Purpose>",
+  "audit_summary": "<3-4 sentence professional audit assessment of the agent card>",
+  "governance_gaps": ["<gap 1>", "<gap 2>"],
+  "recommendations": [
+    {
+      "category": "<Human Oversight | Data Privacy | Operational Autonomy | Risk Mitigation>",
+      "severity": "<HIGH | MEDIUM | LOW>",
+      "finding": "<specific observation from card data>",
+      "remediation": "<actionable fix for developers>"
+    }
+  ]
+}
+
+RULES:
+1. Base your evaluation strictly on the provided AgentCard JSON and score.
+2. Do NOT invent tools, capabilities, or risks not present in the card.
+3. Keep findings professional, actionable, and compliance-focused.
+"""
+
+
+def generate_audit_review(
+    card_dict: Dict[str, Any],
+    score_dict: Dict[str, Any],
+) -> AuditReport:
+    """Calls Groq API (LLaMA 3.3 70B) to generate a structured AI Regulatory Audit Report."""
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "GROQ_API_KEY is not set. Get a free key at https://console.groq.com "
+            "and set it as an environment variable before running the auditor."
+        )
+
+    client = Groq(api_key=api_key)
+    agent_id = card_dict.get("agent_id", "unknown")
+
+    user_payload = (
+        f"AgentCard Data:\n{json.dumps(card_dict, indent=2, default=str)}\n\n"
+        f"Compliance & Risk Score Data:\n{json.dumps(score_dict, indent=2, default=str)}"
+    )
+
+    for attempt in range(2):
+        system = _AUDITOR_SYSTEM_PROMPT
+        if attempt == 1:
+            system += "\n\nYour previous response was not valid JSON. Return ONLY the raw JSON object."
+
+        try:
+            response = client.chat.completions.create(
+                model=MODEL,
+                max_tokens=4000,
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user_payload},
+                ],
+            )
+            raw = response.choices[0].message.content or ""
+            raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+            if raw and not raw.startswith("{"):
+                match = re.search(r"\{.*\}", raw, flags=re.DOTALL)
+                raw = match.group(0) if match else raw
+
+            parsed = json.loads(raw)
+            if "agent_id" not in parsed or not parsed["agent_id"]:
+                parsed["agent_id"] = agent_id
+
+            return AuditReport(**parsed)
+        except Exception as exc:
+            if attempt == 1:
+                # Return a structured fallback report if LLM inference fails completely
+                return AuditReport(
+                    agent_id=agent_id,
+                    eu_ai_act_tier="Transparency Risk (Art. 50)",
+                    audit_summary=f"Automated audit fallback: Card evaluated with score {score_dict.get('overall_score', 0)}/100.",
+                    governance_gaps=score_dict.get("penalties", ["Card review completed."]),
+                    recommendations=[
+                        AuditRecommendation(
+                            category="Governance & Oversight",
+                            severity="MEDIUM" if score_dict.get("overall_score", 0) >= 70 else "HIGH",
+                            finding=p,
+                            remediation="Update agent_config.json or tool_manifest.json to add required safeguards."
+                        )
+                        for p in score_dict.get("penalties", ["Review oversight controls."])[:3]
+                    ],
+                )
+            continue
+
+    raise RuntimeError("Unreachable")
